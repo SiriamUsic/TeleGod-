@@ -1668,7 +1668,7 @@ Redis:del(TeleGod.."All:Command:Reids:Group:New"..msg_chat_id)
 Redis:srem(TeleGod.."All:Command:List:Group",text)
 send(msg_chat_id,msg_id,"✦ تم ازالة هاذا ← { "..text.." }","md",true)
 else
-send(msg_chat_id,msg_id,"✦ لا يوجد امر بهاذا الاسم","md",true)
+send(msg_chat_id,msg_id,"✦ لا يوجد امر بهذا الاسم","md",true)
 end
 Redis:del(TeleGod.."All:Command:Reids:Group:Del"..msg_chat_id..":"..msg.sender.user_id)
 return false
@@ -1733,7 +1733,7 @@ Redis:del(TeleGod.."Command:Reids:Group:New"..msg_chat_id)
 Redis:srem(TeleGod.."Command:List:Group"..msg_chat_id,text)
 send(msg_chat_id,msg_id,"✦ تم ازالة هاذا ← { "..text.." }","md",true)
 else
-send(msg_chat_id,msg_id,"✦ لا يوجد امر بهاذا الاسم","md",true)
+send(msg_chat_id,msg_id,"✦ لا يوجد امر بهذا الاسم","md",true)
 end
 Redis:del(TeleGod.."Command:Reids:Group:Del"..msg_chat_id..":"..msg.sender.user_id)
 return false
@@ -2721,7 +2721,7 @@ Redis:del(TeleGod.."AddSudosNew"..msg_chat_id)
 if text and text:match("^@[%a%d_]+$") then
 local UserId_Info = LuaTele.searchPublicChat(text)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -2847,17 +2847,161 @@ return LuaTele.sendDocument(msg_chat_id,msg_id,'./'..UserBot..'.json', '*✦ ت�
 end
 if text == 'تفعيل جلب النسخه التلقائيه' then   
 if not msg.Devss then
-return send(msg_chat_id,msg_id,'\n*⌯ هذا الامر يخص { '..Controller_Num(2)..' }* ',"md",true)  
+return send(msg_chat_id,msg_id,'\n*✦ هذا الامر يخص { '..Controller_Num(2)..' }* ',"md",true)  
 end
 Redis:setex(TeleGod.."Status:SendFile",43200,true) 
-return send(msg_chat_id,msg_id,"⌯ تم تفعيل جلب نسخة الجروبات التلقائيه","md")
+return send(msg_chat_id,msg_id,"✦ تم تفعيل جلب نسخة الجروبات التلقائيه","md")
 end
 if text == 'تعطيل جلب النسخه التلقائيه' then   
 if not msg.Devss then
-return send(msg_chat_id,msg_id,'\n*⌯ هذا الامر يخص { '..Controller_Num(2)..' }* ',"md",true)  
+return send(msg_chat_id,msg_id,'\n*✦ هذا الامر يخص { '..Controller_Num(2)..' }* ',"md",true)  
 end
 Redis:del(TeleGod.."Status:SendFile") 
-return send(msg_chat_id,msg_id,"⌯ تم تعطيل جلب نسخة الجروبات التلقائيه","md")
+return send(msg_chat_id,msg_id,"✦ تم تعطيل جلب نسخة الجروبات التلقائيه","md")
+end
+
+if tonumber(Redis:ttl(TeleGod.."Status:SendFile")) <= 1 then
+local Get_Json = '{"BotId": '..TeleGod..','  
+Get_Json = Get_Json..'"GroupsBotreply":{'
+local Groups = Redis:smembers(TeleGod..'ChekBotAdd')  
+for k,ide in pairs(Groups) do   
+listrep = Redis:smembers(TeleGod.."List:Manager"..ide.."")
+if k == 1 then
+Get_Json = Get_Json..'"'..ide..'":{'
+else
+Get_Json = Get_Json..',"'..ide..'":{'
+end
+if #listrep >= 5 then
+for k,v in pairs(listrep) do
+if Redis:get(TeleGod.."Add:Rd:Manager:Gif"..v..ide) then
+db = "gif@"..Redis:get(TeleGod.."Add:Rd:Manager:Gif"..v..ide)
+elseif Redis:get(TeleGod.."Add:Rd:Manager:Vico"..v..ide) then
+db = "Vico@"..Redis:get(TeleGod.."Add:Rd:Manager:Vico"..v..ide)
+elseif Redis:get(TeleGod.."Add:Rd:Manager:Stekrs"..v..ide) then
+db = "Stekrs@"..Redis:get(TeleGod.."Add:Rd:Manager:Stekrs"..v..ide)
+elseif Redis:get(TeleGod.."Add:Rd:Manager:Text"..v..ide) then
+db = "Text@"..Redis:get(TeleGod.."Add:Rd:Manager:Text"..v..ide)
+db = string.gsub(db,'"','')
+db = string.gsub(db,"'",'')
+db = string.gsub(db,'*','')
+db = string.gsub(db,'`','')
+db = string.gsub(db,'{','')
+db = string.gsub(db,'}','')
+db = string.gsub(db,'\n',' ')
+elseif Redis:get(TeleGod.."Add:Rd:Manager:Photo"..v..ide) then
+db = "Photo@"..Redis:get(TeleGod.."Add:Rd:Manager:Photo"..v..ide) 
+elseif Redis:get(TeleGod.."Add:Rd:Manager:Video"..v..ide) then
+db = "Video@"..Redis:get(TeleGod.."Add:Rd:Manager:Video"..v..ide)
+elseif Redis:get(TeleGod.."Add:Rd:Manager:File"..v..ide) then
+db = "File@"..Redis:get(TeleGod.."Add:Rd:Manager:File"..v..ide)
+elseif Redis:get(TeleGod.."Add:Rd:Manager:Audio"..v..ide) then
+db = "Audio@"..Redis:get(TeleGod.."Add:Rd:Manager:Audio"..v..ide)
+elseif Redis:get(TeleGod.."Add:Rd:Manager:video_note"..v..ide) then
+db = "video_note@"..Redis:get(TeleGod.."Add:Rd:Manager:video_note"..v..ide)
+end
+v = string.gsub(v,'"','')
+v = string.gsub(v,"'",'')
+Get_Json = Get_Json..'"'..v..'":"'..db..'",'
+end   
+Get_Json = Get_Json..'"taha":"ok"'
+end
+Get_Json = Get_Json..'}'
+end
+Get_Json = Get_Json..'}}'
+local File = io.open('./ReplyGroups.json', "w")
+File:write(Get_Json)
+File:close()
+bot.sendDocument(Sudo_Id,0,'./ReplyGroups.json', '', 'md')
+
+local Groups = Redis:smembers(TeleGod..'ChekBotAdd')  
+local UsersBot = Redis:smembers(TeleGod..'Num:User:Pv')  
+local Get_Json = '{"BotId": '..TeleGod..','  
+if #UsersBot ~= 0 then 
+Get_Json = Get_Json..'"UsersBot":['  
+for k,v in pairs(UsersBot) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
+end
+end   
+Get_Json = Get_Json..']'
+end
+Get_Json = Get_Json..',"GroupsBot":{'
+for k,v in pairs(Groups) do   
+local President = Redis:smembers(TeleGod.."SuperCreator:Group"..v)
+local Constructor = Redis:smembers(TeleGod.."Creator:Group"..v)
+local Manager = Redis:smembers(TeleGod.."Manger:Group"..v)
+local Admin = Redis:smembers(TeleGod.."Admin:Group"..v)
+local Vips = Redis:smembers(TeleGod.."Special:Group"..v)
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'":{'
+else
+Get_Json = Get_Json..',"'..v..'":{'
+end
+if #President ~= 0 then 
+Get_Json = Get_Json..'"President":['
+for k,v in pairs(President) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
+end
+end   
+Get_Json = Get_Json..'],'
+end
+if #Constructor ~= 0 then
+Get_Json = Get_Json..'"Constructor":['
+for k,v in pairs(Constructor) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
+end
+end   
+Get_Json = Get_Json..'],'
+end
+if #Manager ~= 0 then
+Get_Json = Get_Json..'"Manager":['
+for k,v in pairs(Manager) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
+end
+end   
+Get_Json = Get_Json..'],'
+end
+if #Admin ~= 0 then
+Get_Json = Get_Json..'"Admin":['
+for k,v in pairs(Admin) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
+end
+end   
+Get_Json = Get_Json..'],'
+end
+if #Vips ~= 0 then
+Get_Json = Get_Json..'"Vips":['
+for k,v in pairs(Vips) do
+if k == 1 then
+Get_Json = Get_Json..'"'..v..'"'
+else
+Get_Json = Get_Json..',"'..v..'"'
+end
+end   
+Get_Json = Get_Json..'],'
+end
+Get_Json = Get_Json..'"Dev":"BK_ZT "}'
+end
+Get_Json = Get_Json..'}}'
+local File = io.open('./'..UserBot..'.json', "w")
+File:write(Get_Json)
+File:close()
+bot.sendDocument(Sudo_Id,0,'./'..UserBot..'.json', '*✦ تم جلب النسخه الاحتياطيه\n✦ تحتوي على {'..#Groups..'} جروب \n✦ وتحتوي على {'..#UsersBot..'} مشترك *\n', 'md')
+Redis:setex(TeleGod.."Status:SendFile",43200,true) 
 end
 
 if text and text:match("^تعين عدد الاعضاء (%d+)$") then
@@ -3234,7 +3378,7 @@ end
 local UserName = text:match('^ايدي @(%S+)$') or text:match('^كشف @(%S+)$')
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -3416,7 +3560,7 @@ if text and text:match('^تنزيل (.*) @(%S+)$') then
 local UserName = {text:match('^تنزيل (.*) @(%S+)$')}
 local UserId_Info = LuaTele.searchPublicChat(UserName[2])
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -3905,7 +4049,7 @@ if text and text:match('^رفع (.*) @(%S+)$') then
 local UserName = {text:match('^رفع (.*) @(%S+)$')}
 local UserId_Info = LuaTele.searchPublicChat(UserName[2])
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5383,7 +5527,7 @@ return send(msg_chat_id,msg_id,'\n*✦ هذا الامر يخص  '..Controller_N
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5413,7 +5557,7 @@ end
 
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5437,7 +5581,7 @@ end
 
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5467,7 +5611,7 @@ end
 
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5504,7 +5648,7 @@ return send(msg_chat_id,msg_id,"✦ تم تعطيل (الحظر : الطرد : �
 end 
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5541,7 +5685,7 @@ return send(msg_chat_id,msg_id,'\n*✦ البوت ليس لديه صلاحيه �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5573,7 +5717,7 @@ return send(msg_chat_id,msg_id,'\n*✦ البوت ليس لديه صلاحيه �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5603,7 +5747,7 @@ return send(msg.chat_id,msg.id,'*\n✦ عليك الاشتراك في قناة �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5639,7 +5783,7 @@ return send(msg_chat_id,msg_id,"✦ تم تعطيل (الحظر : الطرد : �
 end 
 local UserId_Info = LuaTele.searchPublicChat(UserName[3])
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5771,7 +5915,7 @@ return send(msg_chat_id,msg_id,"✦ تم تعطيل (الحظر : الطرد : �
 end 
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5804,7 +5948,7 @@ return send(msg_chat_id,msg_id,'\n*✦ البوت ليس لديه صلاحيه �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -5837,7 +5981,7 @@ return send(msg_chat_id,msg_id,"✦ تم تعطيل (الحظر : الطرد : �
 end 
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -9280,7 +9424,7 @@ return send(msg.chat_id,msg.id,'*\n✦ عليك الاشتراك في قناة �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -9416,7 +9560,7 @@ return send(msg_chat_id,msg_id,'\n*✦ البوت ليس لديه صلاحيه �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName[1])
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -9492,7 +9636,7 @@ return send(msg_chat_id,msg_id,'\n*✦ البوت ليس لديه صلاحيه �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -9565,7 +9709,7 @@ return send(msg_chat_id,msg_id,'\n*✦ البوت ليس لديه صلاحيه �
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -11392,7 +11536,7 @@ return send(msg_chat_id,msg_id,"\n*✦ عذرآ البوت ليس ادمن في 
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -11485,7 +11629,7 @@ return send(msg_chat_id,msg_id,"\n*✦ عذرآ البوت ليس ادمن في 
 end
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -12428,7 +12572,7 @@ end
 local UserName = text:match('^انذار @(%S+)$') or text:match('^إنذار @(%S+)$')
 local UserId_Info = LuaTele.searchPublicChat(UserName)
 if not UserId_Info.id then
-return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهاذا المعرف ","md",true)  
+return send(msg_chat_id,msg_id,"\n✦ عذرآ لا يوجد حساب بهذا المعرف ","md",true)  
 end
 if UserId_Info.type.is_channel == true then
 return send(msg_chat_id,msg_id,"\n✦ عذرآ لا تستطيع استخدام معرف قناة او جروب ","md",true)  
@@ -13462,14 +13606,12 @@ end
 if text == 'السورس' or text == 'سورس' or text == 'يا سورس' or text == 'source' then
 photo = "https://t.me/sertonge/3"
 local T =[[
-⩹━━━━✦ 𝗧𝗘𝗟𝗘𝗚𝗢𝗗 ✦ ━━━━⩺
 The besT sourCe on TeLeGrAm
-⩹━━━━✦ 𝗧𝗘𝗟𝗘𝗚𝗢𝗗 ✦ ━━━━⩺
 ]]
 keyboard = {} 
 keyboard.inline_keyboard = {
 {
-{text = 'أضـف البـوت الـي مجـموعـتـك ✅', url = 't.me/'..UserBot..'?startgroup=new'},
+{text = 'أضـف البـوت الـي مجـموعـتـك ➕', url = 't.me/'..UserBot..'?startgroup=new'},
 },
 }
 local msgg = msg_id/2097152/0.5
@@ -16596,7 +16738,7 @@ if tonumber(NumberGame) == tonumber(0) then
 return send(msg_chat_id,msg_id,"✦ ليس لديك نقاط من الالعاب \n✦ اذا كنت تريد ربح النقاط \n✦ ارسل الالعاب وابدأ اللعب ! ","md",true)  
 end
 if tonumber(NumGame) > tonumber(NumberGame) then
-return send(msg_chat_id,msg_id,"\n✦ ليس لديك نقاط بهاذا العدد \n✦ لزيادة نقاطك في اللعبه \n✦ ارسل الالعاب وابدأ اللعب !","md",true)   
+return send(msg_chat_id,msg_id,"\n✦ ليس لديك نقاط بهذا العدد \n✦ لزيادة نقاطك في اللعبه \n✦ ارسل الالعاب وابدأ اللعب !","md",true)   
 end
 local Xnxx = (tonumber(NumGame) * 50)
 Redis:decrby(TeleGod.."Num:Add:Games"..msg.chat_id..msg.sender.user_id,NumGame)  
